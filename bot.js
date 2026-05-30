@@ -1,5 +1,6 @@
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const Parser = require('rss-parser');
+const http = require('http');
 
 // ============================================================
 // CONFIGURATION
@@ -10,6 +11,12 @@ const CONFIG = {
 
   // On startup, skip articles older than this many minutes
   MAX_ARTICLE_AGE_MINUTES: 10,
+
+  // Max articles to remember (prevents memory leak)
+  MAX_SEEN_ARTICLES: 2000,
+
+  // Keep-alive server port (Render requires a port to stay alive)
+  KEEP_ALIVE_PORT: process.env.PORT || 3000,
 
   KEYWORDS: [
     // Trump / Political
@@ -30,7 +37,7 @@ const CONFIG = {
     'FDA approval', 'FDA rejection', 'FOMC', 'rate decision', 'Fed rate',
   ],
 
-  CHECK_INTERVAL_MS: 1 * 5 * 1000, // every 2 minutes
+  CHECK_INTERVAL_MS: 2 * 60 * 1000, // every 2 minutes
 
   RSS_FEEDS: [
     { name: 'Reuters Business',    url: 'https://feeds.reuters.com/reuters/businessNews' },
@@ -61,6 +68,24 @@ const seenArticles = new Set();
 let alertChannel = null;
 let isFirstRun = true;
 
+// ── Keep-alive web server ────────────────────────────────────
+// Render needs an open port to keep the service alive on free tier
+http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('Bot is running');
+}).listen(CONFIG.KEEP_ALIVE_PORT, () => {
+  console.log(`🌐 Keep-alive server running on port ${CONFIG.KEEP_ALIVE_PORT}`);
+});
+
+// ── Capped set — trims oldest entries when limit is hit ──────
+function addSeen(url) {
+  if (seenArticles.size >= CONFIG.MAX_SEEN_ARTICLES) {
+    const first = seenArticles.values().next().value;
+    seenArticles.delete(first);
+  }
+  seenArticles.add(url);
+}
+
 // ── Age check — skips old articles on startup ────────────────
 function isArticleTooOld(item) {
   if (!item.pubDate) return false;
@@ -81,7 +106,7 @@ async function checkFeed(feed) {
     const parsed = await parser.parseURL(feed.url);
     for (const item of parsed.items) {
       if (seenArticles.has(item.link)) continue;
-      seenArticles.add(item.link);
+      addSeen(item.link);
 
       if (isArticleTooOld(item)) {
         console.log(`[SKIP] Too old: ${item.title?.slice(0, 60)}`);
@@ -114,7 +139,7 @@ async function checkFeed(feed) {
 
 // ── Main loop ────────────────────────────────────────────────
 async function runChecks() {
-  console.log(`[${new Date().toLocaleTimeString()}] Checking ${CONFIG.RSS_FEEDS.length} feeds...${isFirstRun ? ' (first run — skipping old articles)' : ''}`);
+  console.log(`[${new Date().toLocaleTimeString()}] Checking ${CONFIG.RSS_FEEDS.length} feeds... (tracking ${seenArticles.size}/${CONFIG.MAX_SEEN_ARTICLES} articles)`);
   await Promise.allSettled(CONFIG.RSS_FEEDS.map(feed => checkFeed(feed)));
   isFirstRun = false;
 }
