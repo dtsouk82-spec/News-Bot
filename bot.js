@@ -62,7 +62,12 @@ const CONFIG = {
 };
 // ============================================================
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+  ]
+});
 const parser = new Parser();
 const seenArticles = new Set();
 let alertChannel = null;
@@ -148,9 +153,11 @@ async function runChecks() {
 client.once('ready', async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
 
-  alertChannel = await client.channels.fetch(CONFIG.CHANNEL_ID);
-  if (!alertChannel) {
-    console.error('❌ Could not find channel. Check CHANNEL_ID in config.');
+  try {
+    alertChannel = await client.channels.fetch(CONFIG.CHANNEL_ID);
+  } catch (err) {
+    console.error('❌ Could not find channel:', err.message);
+    console.error('Check that CHANNEL_ID is correct and the bot has access to the channel.');
     process.exit(1);
   }
 
