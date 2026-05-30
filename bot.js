@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const Parser = require('rss-parser');
 const http = require('http');
+const fs = require('fs');
 
 // ============================================================
 // CONFIGURATION
@@ -12,6 +13,7 @@ const CONFIG = {
   MAX_ARTICLE_AGE_MINUTES: 10,
   MAX_SEEN_ARTICLES: 2000,
   KEEP_ALIVE_PORT: process.env.PORT || 3000,
+  SEEN_FILE: './seen_articles.json',
 
   KEYWORDS: [
     // Trump / Political
@@ -69,7 +71,29 @@ const client = new Client({
   ]
 });
 const parser = new Parser();
-const seenArticles = new Set();
+// ── Load seen articles from disk (survives restarts) ────────
+function loadSeen() {
+  try {
+    if (fs.existsSync(CONFIG.SEEN_FILE)) {
+      const data = JSON.parse(fs.readFileSync(CONFIG.SEEN_FILE, 'utf8'));
+      return new Set(data);
+    }
+  } catch (err) {
+    console.error('[SEEN] Failed to load seen articles:', err.message);
+  }
+  return new Set();
+}
+
+function saveSeen() {
+  try {
+    fs.writeFileSync(CONFIG.SEEN_FILE, JSON.stringify([...seenArticles]));
+  } catch (err) {
+    console.error('[SEEN] Failed to save seen articles:', err.message);
+  }
+}
+
+const seenArticles = loadSeen();
+console.log(`[SEEN] Loaded ${seenArticles.size} previously seen articles from disk`);
 let alertChannel = null;
 let isFirstRun = true;
 
@@ -88,6 +112,7 @@ function addSeen(url) {
     seenArticles.delete(first);
   }
   seenArticles.add(url);
+  saveSeen();
 }
 
 // ── Age check ────────────────────────────────────────────────
