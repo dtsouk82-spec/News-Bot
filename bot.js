@@ -40,24 +40,24 @@ const CONFIG = {
   CHECK_INTERVAL_MS: 2 * 60 * 1000, // every 2 minutes
 
   RSS_FEEDS: [
-    { name: 'Reuters Business',    url: 'https://feeds.reuters.com/reuters/businessNews' },
+    { name: 'Reuters (via Google)',url: 'https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com+business&ceid=US:en&hl=en-US&gl=US' },
     { name: 'CNBC',                url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html' },
     { name: 'Bloomberg Markets',   url: 'https://feeds.bloomberg.com/markets/news.rss' },
     { name: 'MarketWatch',         url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
     { name: 'Yahoo Finance',       url: 'https://finance.yahoo.com/news/rssindex' },
-    { name: 'Unusual Whales',      url: 'https://unusualwhales.com/rss/news' },
-    { name: 'Politico',            url: 'https://www.politico.com/rss/politics08.xml' },
+    { name: 'Benzinga',             url: 'https://www.benzinga.com/feed' },
+    { name: 'Politico (via Google)',url: 'https://news.google.com/rss/search?q=when:24h+allinurl:politico.com&ceid=US:en&hl=en-US&gl=US' },
     { name: 'The Hill',            url: 'https://thehill.com/rss/syndicator/19109' },
     { name: 'Axios',               url: 'https://api.axios.com/feed/' },
     { name: 'WSJ Markets',         url: 'https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines' },
     { name: 'Seeking Alpha',       url: 'https://seekingalpha.com/market_currents.xml' },
-    { name: 'Investopedia',        url: 'https://www.investopedia.com/feedbuilder/feed/getfeed?feedName=rss_headline' },
-    { name: 'Barrons',             url: 'https://www.barrons.com/xml/rss/3_7014.xml' },
-    { name: 'AP Business',         url: 'https://rsshub.app/apnews/topics/apf-business' },
+    { name: 'TheStreet',           url: 'https://www.thestreet.com/rss/index.xml' },
+    { name: 'Barrons (via Google)', url: 'https://news.google.com/rss/search?q=when:24h+allinurl:barrons.com&ceid=US:en&hl=en-US&gl=US' },
+    { name: 'AP Business',         url: 'https://feeds.apnews.com/rss/business' },
     { name: 'NPR Politics',        url: 'https://feeds.npr.org/1014/rss.xml' },
-    { name: 'Quiver Quantitative', url: 'https://www.quiverquant.com/news/rss' },
-    { name: 'Capitol Trades',      url: 'https://www.capitoltrades.com/rss' },
-    { name: 'SEC EDGAR 8-K',       url: 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&dateb=&owner=include&count=40&output=atom' },
+    { name: 'FT Markets',          url: 'https://www.ft.com/markets?format=rss' },
+    { name: 'Washington Post Markets', url: 'https://feeds.washingtonpost.com/rss/business/economy' },
+    { name: 'SEC News',            url: 'https://www.sec.gov/rss/news/press.rss' },
   ],
 };
 // ============================================================
