@@ -1,0 +1,13 @@
+{
+  "name": "news-alert-bot",
+  "version": "1.0.0",
+  "description": "Discord bot that monitors news RSS feeds for keywords and sends real-time alerts",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.0.0",
+    "rss-parser": "^3.13.0"
+  }
+}
