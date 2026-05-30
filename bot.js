@@ -49,15 +49,15 @@ const CONFIG = {
     { name: 'MarketWatch',     url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
     { name: 'Yahoo Finance',   url: 'https://finance.yahoo.com/news/rssindex' },
     { name: 'Benzinga',        url: 'https://www.benzinga.com/feed' },
-    { name: 'TheStreet',       url: 'https://www.thestreet.com/rss/index.xml' },
+    { name: 'TheStreet',       url: 'https://news.google.com/rss/search?q=when:24h+allinurl:thestreet.com&ceid=US:en&hl=en-US&gl=US' },
     { name: 'Seeking Alpha',   url: 'https://seekingalpha.com/market_currents.xml' },
     { name: 'The Hill',        url: 'https://thehill.com/rss/syndicator/19109' },
     { name: 'Axios',           url: 'https://api.axios.com/feed/' },
-    { name: 'AP Business',     url: 'https://feeds.apnews.com/rss/business' },
+    { name: 'AP Business',     url: 'https://news.google.com/rss/search?q=when:24h+allinurl:apnews.com+business&ceid=US:en&hl=en-US&gl=US' },
     { name: 'NPR Politics',    url: 'https://feeds.npr.org/1014/rss.xml' },
     { name: 'FT Markets',      url: 'https://www.ft.com/markets?format=rss' },
     { name: 'WashPost Markets',url: 'https://feeds.washingtonpost.com/rss/business/economy' },
-    { name: 'SEC News',        url: 'https://www.sec.gov/rss/news/press.rss' },
+    { name: 'SEC News',        url: 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=&dateb=&owner=include&count=10&search_text=&output=atom' },
   ],
 };
 // ============================================================
