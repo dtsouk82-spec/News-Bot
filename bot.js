@@ -9,13 +9,8 @@ const CONFIG = {
   DISCORD_TOKEN: process.env.DISCORD_TOKEN,
   CHANNEL_ID: process.env.CHANNEL_ID,
 
-  // On startup, skip articles older than this many minutes
   MAX_ARTICLE_AGE_MINUTES: 10,
-
-  // Max articles to remember (prevents memory leak)
   MAX_SEEN_ARTICLES: 2000,
-
-  // Keep-alive server port (Render requires a port to stay alive)
   KEEP_ALIVE_PORT: process.env.PORT || 3000,
 
   KEYWORDS: [
@@ -37,27 +32,32 @@ const CONFIG = {
     'FDA approval', 'FDA rejection', 'FOMC', 'rate decision', 'Fed rate',
   ],
 
-  CHECK_INTERVAL_MS: 2 * 60 * 1000, // every 2 minutes
+  CHECK_INTERVAL_MS: 2 * 60 * 1000,
 
+  // Only feeds confirmed to work without blocking bots
   RSS_FEEDS: [
-    { name: 'Reuters (via Google)',url: 'https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com+business&ceid=US:en&hl=en-US&gl=US' },
-    { name: 'CNBC',                url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html' },
-    { name: 'Bloomberg Markets',   url: 'https://feeds.bloomberg.com/markets/news.rss' },
-    { name: 'MarketWatch',         url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
-    { name: 'Yahoo Finance',       url: 'https://finance.yahoo.com/news/rssindex' },
-    { name: 'Benzinga',             url: 'https://www.benzinga.com/feed' },
-    { name: 'Politico (via Google)',url: 'https://news.google.com/rss/search?q=when:24h+allinurl:politico.com&ceid=US:en&hl=en-US&gl=US' },
-    { name: 'The Hill',            url: 'https://thehill.com/rss/syndicator/19109' },
-    { name: 'Axios',               url: 'https://api.axios.com/feed/' },
-    { name: 'WSJ Markets',         url: 'https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines' },
-    { name: 'Seeking Alpha',       url: 'https://seekingalpha.com/market_currents.xml' },
-    { name: 'TheStreet',           url: 'https://www.thestreet.com/rss/index.xml' },
-    { name: 'Barrons (via Google)', url: 'https://news.google.com/rss/search?q=when:24h+allinurl:barrons.com&ceid=US:en&hl=en-US&gl=US' },
-    { name: 'AP Business',         url: 'https://feeds.apnews.com/rss/business' },
-    { name: 'NPR Politics',        url: 'https://feeds.npr.org/1014/rss.xml' },
-    { name: 'FT Markets',          url: 'https://www.ft.com/markets?format=rss' },
-    { name: 'Washington Post Markets', url: 'https://feeds.washingtonpost.com/rss/business/economy' },
-    { name: 'SEC News',            url: 'https://www.sec.gov/rss/news/press.rss' },
+    // Google News proxies (bypasses bot blocking on major outlets)
+    { name: 'Reuters',         url: 'https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com+business&ceid=US:en&hl=en-US&gl=US' },
+    { name: 'Politico',        url: 'https://news.google.com/rss/search?q=when:24h+allinurl:politico.com+stock&ceid=US:en&hl=en-US&gl=US' },
+    { name: 'Barrons',         url: 'https://news.google.com/rss/search?q=when:24h+allinurl:barrons.com&ceid=US:en&hl=en-US&gl=US' },
+    { name: 'WSJ',             url: 'https://news.google.com/rss/search?q=when:24h+allinurl:wsj.com+markets&ceid=US:en&hl=en-US&gl=US' },
+    { name: 'Bloomberg',       url: 'https://news.google.com/rss/search?q=when:24h+allinurl:bloomberg.com+markets&ceid=US:en&hl=en-US&gl=US' },
+    { name: 'CNBC Markets',    url: 'https://news.google.com/rss/search?q=when:24h+allinurl:cnbc.com+markets&ceid=US:en&hl=en-US&gl=US' },
+
+    // Direct RSS feeds that work reliably
+    { name: 'CNBC',            url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html' },
+    { name: 'MarketWatch',     url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
+    { name: 'Yahoo Finance',   url: 'https://finance.yahoo.com/news/rssindex' },
+    { name: 'Benzinga',        url: 'https://www.benzinga.com/feed' },
+    { name: 'TheStreet',       url: 'https://www.thestreet.com/rss/index.xml' },
+    { name: 'Seeking Alpha',   url: 'https://seekingalpha.com/market_currents.xml' },
+    { name: 'The Hill',        url: 'https://thehill.com/rss/syndicator/19109' },
+    { name: 'Axios',           url: 'https://api.axios.com/feed/' },
+    { name: 'AP Business',     url: 'https://feeds.apnews.com/rss/business' },
+    { name: 'NPR Politics',    url: 'https://feeds.npr.org/1014/rss.xml' },
+    { name: 'FT Markets',      url: 'https://www.ft.com/markets?format=rss' },
+    { name: 'WashPost Markets',url: 'https://feeds.washingtonpost.com/rss/business/economy' },
+    { name: 'SEC News',        url: 'https://www.sec.gov/rss/news/press.rss' },
   ],
 };
 // ============================================================
@@ -74,15 +74,14 @@ let alertChannel = null;
 let isFirstRun = true;
 
 // ── Keep-alive web server ────────────────────────────────────
-// Render needs an open port to keep the service alive on free tier
 http.createServer((req, res) => {
   res.writeHead(200);
   res.end('Bot is running');
 }).listen(CONFIG.KEEP_ALIVE_PORT, () => {
-  console.log(`🌐 Keep-alive server running on port ${CONFIG.KEEP_ALIVE_PORT}`);
+  console.log(`🌐 Keep-alive server on port ${CONFIG.KEEP_ALIVE_PORT}`);
 });
 
-// ── Capped set — trims oldest entries when limit is hit ──────
+// ── Capped seen-articles set ─────────────────────────────────
 function addSeen(url) {
   if (seenArticles.size >= CONFIG.MAX_SEEN_ARTICLES) {
     const first = seenArticles.values().next().value;
@@ -91,7 +90,7 @@ function addSeen(url) {
   seenArticles.add(url);
 }
 
-// ── Age check — skips old articles on startup ────────────────
+// ── Age check ────────────────────────────────────────────────
 function isArticleTooOld(item) {
   if (!item.pubDate) return false;
   const ageMinutes = (Date.now() - new Date(item.pubDate).getTime()) / 1000 / 60;
@@ -135,7 +134,7 @@ async function checkFeed(feed) {
         .setTimestamp();
 
       await alertChannel.send({ embeds: [embed] });
-      console.log(`[ALERT] Matched "${matchedKeyword}" in: ${item.title}`);
+      console.log(`[ALERT] "${matchedKeyword}" | ${feed.name} | ${item.title}`);
     }
   } catch (err) {
     console.error(`[ERROR] Failed to fetch ${feed.name}: ${err.message}`);
@@ -144,7 +143,7 @@ async function checkFeed(feed) {
 
 // ── Main loop ────────────────────────────────────────────────
 async function runChecks() {
-  console.log(`[${new Date().toLocaleTimeString()}] Checking ${CONFIG.RSS_FEEDS.length} feeds... (tracking ${seenArticles.size}/${CONFIG.MAX_SEEN_ARTICLES} articles)`);
+  console.log(`[${new Date().toLocaleTimeString()}] Checking ${CONFIG.RSS_FEEDS.length} feeds... (${seenArticles.size}/${CONFIG.MAX_SEEN_ARTICLES} tracked)`);
   await Promise.allSettled(CONFIG.RSS_FEEDS.map(feed => checkFeed(feed)));
   isFirstRun = false;
 }
@@ -157,13 +156,11 @@ client.once('ready', async () => {
     alertChannel = await client.channels.fetch(CONFIG.CHANNEL_ID);
   } catch (err) {
     console.error('❌ Could not find channel:', err.message);
-    console.error('Check that CHANNEL_ID is correct and the bot has access to the channel.');
     process.exit(1);
   }
 
-  console.log(`📡 Monitoring channel: #${alertChannel.name}`);
-  console.log(`⏱️  Checking every ${CONFIG.CHECK_INTERVAL_MS / 1000}s`);
-  console.log(`🕐 Skipping articles older than ${CONFIG.MAX_ARTICLE_AGE_MINUTES} min on startup\n`);
+  console.log(`📡 Monitoring: #${alertChannel.name}`);
+  console.log(`⏱️  Every ${CONFIG.CHECK_INTERVAL_MS / 1000}s | Skipping articles older than ${CONFIG.MAX_ARTICLE_AGE_MINUTES}min on startup\n`);
 
   await alertChannel.send({
     embeds: [
