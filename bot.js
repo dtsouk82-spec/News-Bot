@@ -57,7 +57,7 @@ const CONFIG = {
     { name: 'NPR Politics',    url: 'https://feeds.npr.org/1014/rss.xml' },
     { name: 'FT Markets',      url: 'https://www.ft.com/markets?format=rss' },
     { name: 'WashPost Markets',url: 'https://feeds.washingtonpost.com/rss/business/economy' },
-    { name: 'SEC News',        url: 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=&dateb=&owner=include&count=10&search_text=&output=atom' },
+    { name: 'SEC News',        url: 'https://news.google.com/rss/search?q=when:24h+SEC+filing+insider+trading&ceid=US:en&hl=en-US&gl=US' },
   ],
 };
 // ============================================================
