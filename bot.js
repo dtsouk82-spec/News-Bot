@@ -17,11 +17,19 @@ const CONFIG = {
     'Trump endorses',
     'Palantir Trump',
     'Dell Trump',
-    'Intel Trump',
+    'Oracle Trump',
+    'Trump stock trade',
+    'Trump financial disclosure',
+    'presidential stock',
+    'Trump praises',
+    'Trump pumps',
+    'Trump endorsement stock',
+    'White House stock',
+    'Trump bought shares',
   ],
 
   // How often to check for new articles (milliseconds)
-  CHECK_INTERVAL_MS: 2 * 60 * 1000, // every 2 minutes
+  CHECK_INTERVAL_MS: 1 * 15 * 1000, // every 30 seconds
 
   // News RSS feeds to monitor
   RSS_FEEDS: [
@@ -31,6 +39,17 @@ const CONFIG = {
     { name: 'MarketWatch', url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
     { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/news/rssindex' },
     { name: 'Unusual Whales', url: 'https://unusualwhales.com/rss/news' },
+    { name: 'Politico', url: 'https://www.politico.com/rss/politics08.xml' },
+    { name: 'The Hill', url: 'https://thehill.com/rss/syndicator/19109' },
+    { name: 'Axios', url: 'https://api.axios.com/feed/' },
+    { name: 'WSJ Markets', url: 'https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines' },
+    { name: 'Seeking Alpha', url: 'https://seekingalpha.com/market_currents.xml' },
+    { name: 'Investopedia', url: 'https://www.investopedia.com/feedbuilder/feed/getfeed?feedName=rss_headline' },
+    { name: 'Barrons', url: 'https://www.barrons.com/xml/rss/3_7014.xml' },
+    { name: 'AP Business', url: 'https://rsshub.app/apnews/topics/apf-business' },
+    { name: 'NPR Politics', url: 'https://feeds.npr.org/1014/rss.xml' },
+    { name: 'Quiver Quantitative', url: 'https://www.quiverquant.com/news/rss' },
+    { name: 'Capitol Trades', url: 'https://www.capitoltrades.com/rss' },
   ],
 };
 // ============================================================
@@ -101,7 +120,7 @@ client.once('ready', async () => {
     embeds: [
       new EmbedBuilder()
         .setColor(0x00FF00)
-        .setTitle('🟢 News Alert Bot Online')
+        .setTitle('🟢 Ron Burgundy Clocking In')
         .setDescription(`Monitoring **${CONFIG.RSS_FEEDS.length} feeds** for **${CONFIG.KEYWORDS.length} keywords**`)
         .addFields({ name: 'Keywords', value: CONFIG.KEYWORDS.map(k => `\`${k}\``).join(', ') })
         .setTimestamp()
